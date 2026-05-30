@@ -1,7 +1,5 @@
 ## OUTPUT EXAMPLE IS IN DOWNLOAD FOLDER
 https://github.com/Riveong/project-ozymandias/tree/master/download
 ## DEMO
-<video width="640" height="360" controls>
-  <source src="https://github.com/Riveong/project-ozymandias/raw/0ec4938885d5d48c3d863eeb387f98efc818c9ad/2026-05-30%2015-54-31.mkv" type="video/x-matroska">
-  Your browser does not support the video tag.
-</video>
+<img width="800" height="500" alt="ezgif-50a3b4dc00c2c3ca" src="https://github.com/user-attachments/assets/f5a3f352-dc59-4e10-80a0-fbfc3e7d98fd" />
+
