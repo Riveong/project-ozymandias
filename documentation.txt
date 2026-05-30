@@ -1,0 +1,489 @@
+
+
+    Introduction
+    Prerequisites
+    Step 1: Install the CLI
+    Step 2: Authenticate
+    Step 3: Generate Your First Image
+    Step 4: Generate Your First Video
+        Animate a Static Image
+        Use Reference, Transition, Motion Control, and Templates
+    Step 5: Run the Interactive Wizard
+    Beyond Generation: Manage Your Assets and Workspace
+    Script-Friendly Flags
+    Teaching Your AI Agent to Generate Media
+        Installing PixVerse Skills
+        Claude Code
+        Cursor
+        Codex and Other Agents
+    Automation Pipelines
+        Text to Image to Video
+        Full Video Production Pipeline
+        Batch Generation
+    Configuring Defaults
+    What You Can Build
+    Getting Started Checklist
+    Keeping the CLI Up to Date
+    Next Steps
+
+Home
+Blog
+PixVerse CLI: AI Video and Image Generation for Developers
+PixVerse CLI: AI Video and Image Generation for Developers
+
+Install PixVerse CLI, use the latest video and image models, manage assets and templates, and automate media workflows inside AI agents.
+Product Update •
+March 13, 2026
+PixVerse CLI: AI Video and Image Generation for Developers
+Introduction
+
+Every creative workflow has a bottleneck — the moment you have to leave your code editor, open a browser, and manually click through a web interface to generate a piece of media. For developers, AI agents, and anyone building automated content pipelines, that context switch is friction that adds up fast.
+
+PixVerse CLI eliminates that bottleneck. It is the official command-line interface for PixVerse, giving you access to PixVerse generation and workspace workflows directly from your terminal. Text-to-video, image-to-video, text-to-image, image-to-image, transitions, lip-sync speech, reference video, motion control, templates, upscaling, and asset management are all scriptable, pipeable, and available without touching a browser.
+
+What makes PixVerse CLI particularly powerful is its design philosophy: it was built with AI agents in mind. Every command outputs structured JSON, every exit code is deterministic, and every pipeline step is composable. This means you can teach Claude Code, Cursor, Codex, or any other agent to generate images and videos on your behalf — and they will do it correctly, every time.
+
+This guide reflects PixVerse CLI v1.1.9 and walks you through the complete journey: from installation to your first generation, then into multi-step automation pipelines and agent-native workflows.
+Prerequisites
+
+Before starting, you need:
+
+    Node.js 20 or higher — check with node --version
+    A PixVerse account — sign up at pixverse.ai
+    An active PixVerse subscription — the CLI uses the same credit system as the website; only subscribed users can generate content
+
+PixVerse CLI does not require any API keys to be manually copied. Authentication is handled through a browser-based OAuth flow that stores your token locally.
+Step 1: Install the CLI
+
+Install globally with npm:
+
+npm install -g pixverse
+
+Verify the installation:
+
+pixverse --version
+
+If you prefer not to install globally, you can also run commands via npx:
+
+npx pixverse create video --prompt "A cat walking on Mars"
+
+Step 2: Authenticate
+
+Run the login command:
+
+pixverse auth login
+
+The CLI opens a browser for OAuth device authorization. You can also copy the URL and finish authorization from any browser on any device, which is useful for SSH and headless environments. Your token is stored automatically in ~/.pixverse/ and is valid for 30 days.
+
+To verify you are logged in and check your available credits:
+
+pixverse auth status
+pixverse account info
+pixverse account slots
+
+The account info command shows your subscription tier, workspace credits, and usage context. pixverse account usage helps you review credit consumption, while pixverse account slots shows the current concurrent generation slots for image and video jobs. Always check your balance and available slots before running batch jobs.
+Step 3: Generate Your First Image
+
+Text-to-image generation is the fastest way to test your setup. Run:
+
+pixverse create image --prompt "A photorealistic forest path at golden hour" --json
+
+In v1.1.9, create image defaults to GPT Image 2. The --json flag returns structured output:
+
+{
+  "image_id": 789012,
+  "status": "completed",
+  "image_url": "https://...",
+  "prompt": "A photorealistic forest path at golden hour",
+  "model": "gpt-image-2.0",
+  "width": 1440,
+  "height": 1440
+}
+
+For higher resolution output, specify a model that supports it:
+
+pixverse create image \
+  --prompt "A photorealistic forest path at golden hour" \
+  --model seedream-5.0-lite \
+  --quality 2160p \
+  --aspect-ratio 16:9 \
+  --json
+
+PixVerse supports several image models, each with different resolution ceilings and aspect-ratio support:
+Model	--model value	Quality	Notes
+GPT Image 2	gpt-image-2.0	1080p, 1440p, 2160p	Default image model; supports wide and tall aspect ratios
+Nano Banana 2	gemini-3.1-flash	512p, 1080p, 1440p, 2160p	Flexible auto and standard aspect ratios
+Qwen Image	qwen-image	720p, 1080p	Fast generation for common creative tasks
+Nano Banana Pro	gemini-3.0	1080p, 1440p, 2160p	High-quality image creation at larger sizes
+Nano Banana	gemini-2.5-flash	1080p	Lightweight image generation with fast turnaround
+Seedream 5.0 Lite	seedream-5.0-lite	1440p, 1800p, 2160p	High-detail creative images
+Seedream 4.5	seedream-4.5	1440p, 2160p	High-resolution image generation
+Seedream 4.0	seedream-4.0	1080p, 1440p, 2160p	Additional Seedream option for image workflows
+Kling Image O3	kling-image-o3	1080p, 1440p, 2160p	Stylized visual outputs with flexible framing
+Kling Image V3	kling-image-v3	1080p, 1440p	Balanced quality and speed
+
+You can also transform an existing image with image-to-image:
+
+pixverse create image \
+  --prompt "Turn this product photo into a clean watercolor illustration" \
+  --image ./product-photo.png \
+  --model gpt-image-2.0 \
+  --json
+
+To download the generated image:
+
+pixverse asset download 789012
+
+Step 4: Generate Your First Video
+
+Text-to-video works the same way. Generate a 5-second clip:
+
+pixverse create video --prompt "A sunset over ocean waves" --json
+
+For a fully customized generation:
+
+pixverse create video \
+  --prompt "A cinematic drone shot over a misty mountain valley at dawn" \
+  --model v6 \
+  --quality 1080p \
+  --aspect-ratio 16:9 \
+  --duration 8 \
+  --audio \
+  --json
+
+The --audio flag enables AI-generated ambient sound that matches your video content. The --json flag returns a video_url on completion that you can pass directly to a download command or the next step in a pipeline.
+
+PixVerse provides multiple video models with different quality, duration, and mode support:
+Model	--model value	Max Quality	Duration	Notes
+PixVerse V6	v6	1080p	1–15 sec	Default video model; broad aspect-ratio support
+PixVerse C1	pixverse-c1	1080p	1–15 sec	Strong support across video, reference, and transition workflows
+Seedance 2.0 Standard	seedance-2.0-standard	1080p	4–15 sec	Supports video, reference, and transition modes
+Seedance 2.0 Fast	seedance-2.0-fast	720p	4–15 sec	Faster Seedance option for video, reference, and transition modes
+Happy Horse 1.0	happyhorse-1.0	1080p	3–15 sec	Audio-aware video option available for create video
+Kling O3 Pro	kling-o3-pro	720p	3–15 sec	Supports video, reference, and transition workflows
+Kling O3 Standard	kling-o3-standard	720p	3–15 sec	Standard Kling O3 option
+Kling 3.0 Pro	kling-3.0-pro	720p	3–15 sec	Supports video and transition workflows
+Kling 3.0 Standard	kling-3.0-standard	720p	3–15 sec	Standard Kling 3.0 option
+Grok Imagine	grok-imagine	720p	1–15 sec	Supports video, extend, and reference workflows
+Veo 3.1 Lite	veo-3.1-lite	1080p	4, 6, or 8 sec	Supports video and 2-frame transition workflows
+Veo 3.1 Standard	veo-3.1-standard	2160p	4, 6, or 8 sec	Higher-resolution Veo option
+Veo 3.1 Fast	veo-3.1-fast	2160p	4, 6, or 8 sec	Faster Veo option
+Sora 2 Pro	sora-2-pro	1080p	4, 8, or 12 sec	Fixed-duration Sora option
+Sora 2	sora-2	720p	4, 8, or 12 sec	Standard Sora option
+PixVerse v5.6	v5.6	1080p	1–10 sec	Still used for motion-control and selected generation workflows
+Animate a Static Image
+
+To turn a photo or generated image into a video, provide the --image flag:
+
+pixverse create video \
+  --prompt "Gentle wind moves through the scene" \
+  --image ./product-photo.jpg \
+  --model v6 \
+  --quality 1080p \
+  --json
+
+You can pass a local file path or a URL. Local files are uploaded automatically — no manual upload step required. Local image inputs larger than 1920x1920 or 5MB are automatically resized or compressed before upload; remote image URLs are validated by the backend as-is.
+Use Reference, Transition, Motion Control, and Templates
+
+The current CLI supports more than simple text-to-video and image-to-video. These creation modes are useful when you need more control over characters, keyframes, edits, or effects:
+
+# Create a transition between keyframes
+pixverse create transition --images ./frame1.png ./frame2.png
+ 
+# Add lip-sync speech with TTS or an audio file
+pixverse create speech --video <video_id> --tts-text "Welcome to the launch"
+pixverse create speech --video <video_id> --audio ./voiceover.mp3
+ 
+# Extend a generated video
+pixverse create extend --video <video_id>
+ 
+# Modify an existing video
+pixverse create modify --video <video_id> --prompt "Change the background to a beach"
+ 
+# Upscale video resolution
+pixverse create upscale --video <video_id> --quality 1080p
+ 
+# Generate video with reference images
+pixverse create reference --images ./char1.png ./char2.png --prompt "Two friends walking in a park"
+ 
+# Seedance 2.0 reference can mix images and videos
+pixverse create reference \
+  --model seedance-2.0-standard \
+  --images ./character.png \
+  --videos ./motion.mp4 \
+  --prompt "@image1 follows the motion in @video1"
+ 
+# Motion control with a character image and motion reference video
+pixverse create motion-control --image ./character.png --video ./dance.mp4
+ 
+# Create from a template or effect
+pixverse create template --template-id 12345 --image ./photo.png
+
+Not every model supports every creation mode. For example, create reference now supports v6, pixverse-c1, Seedance 2.0, Kling O3, grok-imagine, and v5.6; create modify is tied to v5.5; create motion-control uses v5.6; and lip-sync speech uses v5.
+Step 5: Run the Interactive Wizard
+
+If you are exploring for the first time and are not yet familiar with all the available flags, run any creation command without arguments to enter the guided wizard:
+
+pixverse create video
+pixverse create image
+
+The wizard walks you through prompt, model selection, quality, aspect ratio, duration, and other options step by step — useful for discovering what parameters are available before scripting them.
+Beyond Generation: Manage Your Assets and Workspace
+
+The latest PixVerse CLI also includes management commands that help you build end-to-end terminal workflows:
+
+    pixverse task status <id> and pixverse task wait <id> for task polling
+    pixverse task status --ids 123,456,789 --type video --json for batch status checks
+    pixverse asset list, asset upload, asset info, asset download, and asset delete for asset lifecycle operations
+    pixverse saved list, saved items, saved new, saved rename, saved add, saved remove, and saved delete for saved folders
+    pixverse template categories, template list, template search, and template info for discovering effects and templates
+    pixverse workspace list, workspace status, workspace switch, and workspace manage for multi-workspace operations
+    pixverse account info, account usage, and account slots for credit, usage, and concurrency checks
+    pixverse config set, config list, config path, and config defaults for repeatable local defaults
+
+This makes it straightforward to automate not only creation, but also organization, template discovery, download, workspace routing, and delivery in one script. If you need to run one command against a different workspace, use the global --workspace-id <id> flag; 0 targets your personal workspace.
+Script-Friendly Flags
+
+Most automation depends on predictable output and predictable runtime behavior. These flags are especially useful in scripts and AI-agent workflows:
+Flag	Use It For
+--json	Return structured JSON output
+-p	Short alias for --json
+--count <n>	Generate 1–4 variations from one request
+--seed <number>	Make a generation easier to reproduce
+--off-peak	Use off-peak pricing when available
+--audio / --no-audio	Enable or disable audio generation on supported creation commands
+--multi-shot / --no-multi-shot	Enable or disable multi-shot mode for video
+--no-wait	Submit the job and return immediately
+--timeout <sec>	Set the polling timeout, defaulting to 300 seconds
+--workspace-id <id>	Override the active workspace for a single command
+Teaching Your AI Agent to Generate Media
+
+This is where PixVerse CLI becomes genuinely transformative. Because every command returns structured JSON and uses deterministic exit codes, any AI agent that can run shell commands can be taught to generate images and videos on demand.
+Installing PixVerse Skills
+
+PixVerse Skills is a structured skill library that teaches agents how to use the CLI correctly: command flags, model constraints, multi-step pipelines, and robust error handling.
+
+For Claude Code and other agents that support the skills format, add the PixVerse skills directly:
+
+npx skills add https://github.com/pixverseai/skills --skill pixverse-ai-image-and-video-generator
+
+For Cursor, Claude Code, Codex, and other agent frameworks, this skill improves reliability by giving the agent explicit constraints instead of forcing it to infer them from scratch.
+
+Once your agent has the PixVerse skills loaded, you can give it natural-language instructions like:
+
+    “Generate a 10-second product demo video from this screenshot”
+    “Create four variations of this blog cover image in 16:9 format”
+    “Animate this diagram into a 5-second explainer clip with ambient sound”
+    “Generate three 8-second 16:9 promo clips with different camera motions”
+
+The agent will translate those instructions into the correct CLI commands, parse the JSON output, and handle polling and downloads — no manual intervention required.
+Claude Code
+
+In Claude Code, PixVerse CLI becomes a native tool the agent uses autonomously. After loading the PixVerse skills, you can include media generation directly in any task:
+
+Generate a cover image for this blog post about machine learning,
+use the seedream-5.0-lite model at 2160p in 16:9 format,
+download it to ./assets/cover.webp
+
+Claude Code will invoke the correct CLI commands, parse the image URL from the JSON response, and download the file to your specified path — all within the same session where it is also writing your code.
+
+A typical Claude Code workflow:
+
+# Claude Code runs this autonomously based on your instruction
+IMG=$(pixverse create image \
+  --prompt "Abstract visualization of neural network layers, dark background, blue and purple tones" \
+  --model seedream-5.0-lite \
+  --quality 2160p \
+  --aspect-ratio 16:9 \
+  --json | jq -r '.image_url')
+ 
+# Then animates it
+pixverse create video \
+  --prompt "Slow pan across glowing neural connections" \
+  --image "$IMG" \
+  --model v6 \
+  --quality 1080p \
+  --duration 6 \
+  --json
+
+Cursor
+
+Cursor users can load PixVerse Skills as a project context file. Place the relevant skill files in your .cursor/ directory or add them to your workspace rules. Once loaded, Cursor has full awareness of every PixVerse CLI command and can generate media as part of any coding task.
+
+A common Cursor workflow: ask the agent to generate a mockup image based on a design you are building, then use it as a reference directly in your IDE session — without ever leaving the editor.
+Codex and Other Agents
+
+PixVerse CLI is compatible with any agent that can execute shell commands and parse JSON. The structured output format — consistent field names, predictable error codes, and stderr-separated error messages — ensures that even simple scripting agents can integrate generation reliably.
+
+The exit code contract makes error handling straightforward:
+Code	Meaning	Agent Action
+0	Success	Parse JSON output
+1	General error	Check stderr and retry with validated inputs
+2	Timeout	Retry with longer --timeout
+3	Auth expired	Re-run pixverse auth login
+4	Out of credits	Check balance, notify user
+5	Generation failed	Try different parameters
+6	Validation error	Review flag values
+Automation Pipelines
+
+Once you understand the individual commands, PixVerse CLI unlocks powerful multi-step workflows that run entirely without user interaction.
+Text to Image to Video
+
+One of the most useful pipelines: generate a high-resolution image from a text prompt, then animate it into a video.
+
+# Step 1: Generate a base image
+IMG_RESULT=$(pixverse create image \
+  --prompt "A cyberpunk cityscape at night, neon lights reflecting on wet pavement" \
+  --model gemini-3.1-flash \
+  --quality 2160p \
+  --aspect-ratio 16:9 \
+  --json)
+ 
+IMAGE_URL=$(echo "$IMG_RESULT" | jq -r '.image_url')
+ 
+# Step 2: Animate it into a video
+VID_RESULT=$(pixverse create video \
+  --prompt "Camera slowly pans across the neon-lit streets" \
+  --image "$IMAGE_URL" \
+  --model v6 \
+  --quality 1080p \
+  --duration 8 \
+  --json)
+ 
+VIDEO_ID=$(echo "$VID_RESULT" | jq -r '.video_id')
+ 
+# Step 3: Download the final video
+pixverse asset download "$VIDEO_ID" --json
+
+Full Video Production Pipeline
+
+For polished output, chain creation with post-processing steps. create sound was removed in v1.1.8, so use --audio or --no-audio on supported creation commands instead of adding sound as a separate command:
+
+# Step 1: Create the base video
+RESULT=$(pixverse create video \
+  --prompt "A product being assembled in slow motion" \
+  --model v6 \
+  --quality 720p \
+  --duration 5 \
+  --audio \
+  --json)
+ 
+VID=$(echo "$RESULT" | jq -r '.video_id')
+ 
+# Step 2: Extend duration
+EXTENDED=$(pixverse create extend \
+  --video "$VID" \
+  --json | jq -r '.video_id')
+ 
+pixverse task wait "$EXTENDED" --json
+ 
+# Step 3: Upscale to 1080p
+FINAL=$(pixverse create upscale \
+  --video "$EXTENDED" \
+  --quality 1080p \
+  --json | jq -r '.video_id')
+ 
+pixverse task wait "$FINAL" --json
+ 
+# Step 4: Download
+pixverse asset download "$FINAL" --json
+
+Batch Generation
+
+For content pipelines that require multiple variations, run jobs in parallel:
+
+# Check credits and concurrent generation slots first
+pixverse account info --json
+pixverse account slots --json
+ 
+# Submit four parallel generations
+pixverse create video --prompt "Sunrise over mountains" --no-wait --json > /tmp/v1.json &
+pixverse create video --prompt "Sunset over ocean" --no-wait --json > /tmp/v2.json &
+pixverse create video --prompt "Stars over a desert" --no-wait --json > /tmp/v3.json &
+pixverse create video --prompt "Aurora over a frozen lake" --no-wait --json > /tmp/v4.json &
+wait
+ 
+# Check all returned task IDs in one batch status call
+IDS=$(jq -r '.video_id' /tmp/v1.json /tmp/v2.json /tmp/v3.json /tmp/v4.json | paste -sd, -)
+pixverse task status --ids "$IDS" --type video --json
+ 
+# Wait for each and download
+for f in /tmp/v1.json /tmp/v2.json /tmp/v3.json /tmp/v4.json; do
+  ID=$(jq -r '.video_id' "$f")
+  pixverse task wait "$ID" --json
+  pixverse asset download "$ID" --json
+done
+
+The --no-wait flag submits the job and returns immediately with a task ID, allowing you to submit multiple jobs before polling. In recent versions, --no-wait --json also returns the resolved creation parameters, which is useful for logging and reproducibility. Use --count <n> when you want multiple variations from one prompt, and use batch task status --ids when you want one status response for several running jobs. The pixverse task wait command handles the adaptive polling for you — no manual sleep loops required.
+Configuring Defaults
+
+If you consistently use the same model, quality, or aspect ratio, set them as defaults so you do not have to repeat flags every time:
+
+pixverse config defaults set video model v6
+pixverse config defaults set video quality 1080p
+pixverse config defaults set image model seedream-5.0-lite
+pixverse config set output-dir ~/Downloads/pixverse
+pixverse config defaults show
+pixverse config list
+pixverse config path
+
+Command-line flags always override your configured defaults, so you retain full flexibility while reducing repetition. For workspace-specific automation, add --workspace-id <id> to a command when you want to override the active workspace for that single run.
+What You Can Build
+
+With PixVerse CLI integrated into your agent workflow, the range of automatable tasks expands considerably:
+
+    Documentation — auto-generate product demo videos and screenshots as part of your doc build process
+    Marketing — run nightly batch jobs that produce social media content variations from a single prompt library
+    App development — let your coding agent generate placeholder visuals, mockup animations, or loading screen videos while you build the UI
+    Content pipelines — chain CLI calls with other tools (ffmpeg, ImageMagick, cloud storage) to build fully automated media production workflows
+    Prototyping — generate quick motion concepts in seconds to validate ideas before committing to full production
+
+The CLI is designed to fit naturally into any shell-based workflow. If your existing automation runs in bash, Python, Node, or a CI/CD pipeline, PixVerse CLI slots in without any additional integration overhead.
+Getting Started Checklist
+
+    Install Node.js 20 or higher
+    Run npm install -g pixverse
+    Run pixverse auth login and authorize in browser
+    Run pixverse account info to verify credits
+    Run pixverse account slots before concurrent batch work
+    Generate your first image: pixverse create image --prompt "..." --json
+    Generate your first video: pixverse create video --prompt "..." --json
+    Explore templates with pixverse template list
+    Install PixVerse Skills for your agent (Claude Code, Cursor, or Codex)
+    Set up your preferred defaults with pixverse config defaults set
+    Build your first automation pipeline
+
+Keeping the CLI Up to Date
+
+Use npm to keep your local CLI updated:
+
+npm update -g pixverse
+
+For release-level changes and newly supported models, check the official CLI changelog:
+
+    PixVerse CLI Changelog
+
+As of v1.1.9, recent changes include GPT Image 2 as the default image model, v6 support for create reference, 2160p support for Seedream 5.0 Lite, Seedance 2.0 mixed image-and-video references, and the removal of the deprecated create sound command.
+Next Steps
+
+The PixVerse CLI on npm (npm install -g pixverse) gives you immediate access to generation, task polling, asset management, templates, saved folders, account checks, and workspace controls from a single interface. The PixVerse Skills repository adds agent-ready guidance so Claude Code, Cursor, Codex, and other tools can run these workflows with stronger reliability.
+
+The combination of a reliable CLI and an agent-ready skill library means image and video generation can live in the same workflow as your code — managed by the same agent, in the same terminal, without switching tools.
+
+Start with a single command. Build from there.
+The next generation AI creative studio for everyone. Shape your stories, share your magic, explore the unknown.
+API Platform
+API Documentation
+API Console
+Company
+About Us
+News
+Join Us
+Affiliate
+Products
+PixVerse Web
+API Solutions
+Contact & Support
+support@pixverse.ai
+Feedback
+© PixVerse 2026
