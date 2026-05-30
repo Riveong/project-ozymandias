@@ -1,8 +1,3 @@
-## OUTPUT EXAMPLE IS IN DOWNLOAD FOLDER
-https://github.com/Riveong/project-ozymandias/tree/master/download
-## DEMO
-<img width="800" height="500" alt="ezgif-50a3b4dc00c2c3ca" src="https://github.com/user-attachments/assets/f5a3f352-dc59-4e10-80a0-fbfc3e7d98fd" />
-
 # Team Name: Ozymandias AI
 
 # 1. Group/Individual Information
@@ -11,6 +6,11 @@ https://github.com/Riveong/project-ozymandias/tree/master/download
 |--------|--------|--------|
 | Ario Tua Purba | Product Builder / AI Enthusiast | Product ideation, PRD creation, UX design, AI workflow design, implementation, prompt engineering, pitch preparation |
 | Ong Gabriel Riverino Susanto | Software Engineer | Product ideation, PRD creation, UX design, AI workflow design, implementation, prompt engineering, pitch preparation |
+
+### OUTPUT EXAMPLE IS IN DOWNLOAD FOLDER
+https://github.com/Riveong/project-ozymandias/tree/master/download
+### DEMO App
+<img width="800" height="500" alt="ezgif-50a3b4dc00c2c3ca" src="https://github.com/user-attachments/assets/f5a3f352-dc59-4e10-80a0-fbfc3e7d98fd" />
 
 ---
 
@@ -145,9 +145,5 @@ https://github.com/Riveong/project-ozymandias/tree/master/download
 ## Project Demo
 
 https://github.com/Riveong/project-ozymandias/blob/master/README.md
-
-## Landing Page Example
-
-(Add landing page URL here)
 
 ---
